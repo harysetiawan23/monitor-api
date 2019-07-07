@@ -17,21 +17,22 @@
 const Route = use('Route')
 
 Route.group(() => {
-  Route.get("node", "MasterNodeController.showAll");
-  Route.get("node/:id", "MasterNodeController.show");
-  Route.post("node", "MasterNodeController.store");
-  Route.post("node/:id", "MasterNodeController.update");
-  Route.post("node/drop/:id", "MasterNodeController.drop");
+  Route.get("node", "MasterNodeController.showAll").middleware(['auth']);
+  Route.get("node/:id", "MasterNodeController.show").middleware(['auth']);
+  Route.post("node", "MasterNodeController.store").middleware(['auth']);
+  Route.post("node/:id", "MasterNodeController.update").middleware(['auth']);
+  Route.post("node/drop/:id", "MasterNodeController.drop").middleware(['auth']);
 
-  Route.get("line", "MasterLineController.showAll");
-  Route.get("line/:id", "MasterLineController.show");
-  Route.post("line", "MasterLineController.store");
-  Route.post("line/:id", "MasterLineController.update");
-  Route.post("line/drop/:id", "MasterLineController.drop");
+  Route.get("line", "MasterLineController.showAll").middleware(['auth']);
+  Route.get("line/:id", "MasterLineController.show").middleware(['auth']);
+  Route.post("line", "MasterLineController.store").middleware(['auth']);
+  Route.post("line/:id", "MasterLineController.update").middleware(['auth']);
+  Route.post("line/drop/:id", "MasterLineController.drop").middleware(['auth']);
 
-  Route.get("record/store/:id/:flow/:pressure", "NodeDatumController.eventData");
+  Route.get("record/store/:id/:flow/:pressure", "NodeDatumController.eventData").middleware(['auth']);
 
   Route.post("user/store","UserAuthController.store")
+  Route.post("user/login","UserAuthController.login")
 }).prefix("/api");
 
 

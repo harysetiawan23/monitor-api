@@ -1,37 +1,74 @@
-'use strict'
+"use strict";
 
-const User = use('App/Models/User')
+const User = use("App/Models/User");
 const { validate } = use("Validator");
 
 class UserAuthController {
-  async store({request,response,auth}){
+  async store({ request, response, auth }) {
     let validator = await validate(request.all(), {
-      'name' : 'required',
-      'email' : 'required|email',
-      'password' : 'required',
-      'c_password' : 'required|same:password',
+      name: "required|unique:users,name",
+      email: "required|email|unique:users,email",
+      password: "required",
+      c_password: "required|same:password"
     });
 
-  if (validator.fails()) {
-      return response.json({'errors' : validator.messages()}, 401);
+    if (validator.fails()) {
+      return response.json({ errors: validator.messages() }, 401);
+    }
+
+    let input = request.all();
+
+    delete input.c_password;
+    let user = await User.create(input);
+
+    //Generate a Token for User
+    let userToken = await auth.generate(user);
+
+    //Message for result
+    Object.assign(user, userToken);
+
+    return response.json(user);
   }
 
+  async login({ request, response, auth }) {
+    //Validation Role
+    let loginRule = {
+      email: "required",
+      password: "required"
+    };
+
+    //Validation Process
+    let validationProccess = await validate(request.all(), loginRule);
+
+    //Validation Exceptions
+    if (validationProccess.fails()) {
+      return response.json(validationProccess.messages(), 200);
+    }
+
+    //Get email and password
+    let { email, password } = request.all();
+
+    let {type,token,refreshToken,field,message} = await auth.withRefreshToken().attempt(email, password);
+
+    if (!token) {
+      const messages = {
+        code: 500,
+        status: "failed",
+        action: "login",
+        message: message
+      };
+      return response.json(messages, 200);
+    }
+
+    let user = await User.findBy("email", email);
 
 
-  let input = request.all();
 
-  delete input.c_password;
-  let user = await User.create(input);
+    Object.assign(user, { token: token, refreshToken: refreshToken });
 
 
-  let success = {
-    token: auth.generate(user).token,
-    data:user
-  }
-
-
-  return response.json(success);
+    return response.json(user, 200);
   }
 }
 
-module.exports = UserAuthController
+module.exports = UserAuthController;

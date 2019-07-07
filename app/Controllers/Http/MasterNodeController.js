@@ -4,15 +4,14 @@ const MasterNode = use("App/Models/MasterNode");
 const { validate } = use("Validator");
 
 class MasterNodeController {
-
-  async showAll({response,request,auth}){
-    let masterNode = await MasterNode.query().fetch()
-    return response.json(masterNode)
+  async showAll({ response, request, auth }) {
+    let masterNode = await MasterNode.query().fetch();
+    return response.json(masterNode);
   }
 
-  async show({params,response,request,auth}){
-    let masterNode = await MasterNode.find(params.id)
-    return response.json(masterNode)
+  async show({ params, response, request, auth }) {
+    let masterNode = await MasterNode.find(params.id);
+    return response.json(masterNode);
   }
 
   async store({ request, response, auth }) {
@@ -33,7 +32,7 @@ class MasterNodeController {
     }
 
     let node = request.all();
-    node.user_id = "1";
+    node.user_id = auth.user.id;
     let newNode = await MasterNode.create(request.all());
 
     return response.json(newNode);
@@ -77,13 +76,13 @@ class MasterNodeController {
     }
   }
 
-  async drop({params,request,response,auth}){
-    let dropNodeMaster = await MasterNode.find(params.id)
+  async drop({ params, request, response, auth }) {
+    let dropNodeMaster = await MasterNode.find(params.id);
 
-    let dropAction = await dropNodeMaster.delete()
-    if(!dropAction){
+    let dropAction = await dropNodeMaster.delete();
+    if (!dropAction) {
       return response.json({ error: "database not connected" }, 200);
-    }else{
+    } else {
       return response.json({ success: "delete from database" }, 200);
     }
   }

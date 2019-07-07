@@ -1,17 +1,41 @@
 "use strict";
 const { validate } = use("Validator");
 const MasterLine = use("App/Models/MasterLine");
+const Database = use("Database");
 
 class MasterLineController {
-
-  async showAll({response,request,auth}){
-    let masterLine = await MasterLine.query().fetch()
-    return response.json(masterLine)
+  async showAll({ response, request, auth }) {
+    let masterLine = await Database.raw(
+      "select lm.*," +
+        "(select nm.sn from master_nodes nm where nm.id = lm.start_node_id)           as startNodeSN," +
+        "(select nm.sn from master_nodes nm where nm.id = lm.end_node_id)             as EndNodeSN," +
+        "(select nm.phone_number from master_nodes nm where nm.id = lm.start_node_id) as startNodePhone," +
+        "(select nm.phone_number from master_nodes nm where nm.id = lm.end_node_id)   as endNodePhone," +
+        "(select nm.lat from master_nodes nm where nm.id = lm.start_node_id)          as startNodeLat," +
+        "(select nm.lng from master_nodes nm where nm.id = lm.start_node_id)          as startNodeLng," +
+        "(select nm.lat from master_nodes nm where nm.id = lm.end_node_id)            as endNodeLat," +
+        "(select nm.lng from master_nodes nm where nm.id = lm.end_node_id)            as endNodeLng" +
+        " from master_lines lm" +
+        " where lm.user_id = "+auth.user.id
+    );
+    return response.json(masterLine[0]);
   }
 
-  async show({params,response,request,auth}){
-    let masterLine = await MasterLine.find(params.id)
-    return response.json(masterLine)
+  async show({ params, response, request, auth }) {
+    let masterLine = await Database.raw(
+      "select lm.*," +
+        "(select nm.sn from master_nodes nm where nm.id = lm.start_node_id)           as startNodeSN," +
+        "(select nm.sn from master_nodes nm where nm.id = lm.end_node_id)             as EndNodeSN," +
+        "(select nm.phone_number from master_nodes nm where nm.id = lm.start_node_id) as startNodePhone," +
+        "(select nm.phone_number from master_nodes nm where nm.id = lm.end_node_id)   as endNodePhone," +
+        "(select nm.lat from master_nodes nm where nm.id = lm.start_node_id)          as startNodeLat," +
+        "(select nm.lng from master_nodes nm where nm.id = lm.start_node_id)          as startNodeLng," +
+        "(select nm.lat from master_nodes nm where nm.id = lm.end_node_id)            as endNodeLat," +
+        "(select nm.lng from master_nodes nm where nm.id = lm.end_node_id)            as endNodeLng" +
+        " from master_lines lm" +
+        " where lm.user_id = "+auth.user.id+" and lm.id = "+params.id
+    );
+    return response.json(masterLine[0][0]);
   }
 
   async store({ request, response, auth }) {
@@ -32,7 +56,7 @@ class MasterLineController {
     }
 
     let line = request.all();
-    line.user_id = "1";
+    line.user_id = auth.user.id;
 
     let masterLine = await MasterLine.create(line);
 
@@ -43,7 +67,7 @@ class MasterLineController {
     return response.json(masterLine, 200);
   }
 
-  async update({request,response,auth,params}){
+  async update({ request, response, auth, params }) {
     let validator = await validate(request.all(), {
       name: "required",
       start: "required",
@@ -62,7 +86,6 @@ class MasterLineController {
 
     let lineMaster = await MasterLine.find(params.id);
 
-
     lineMaster.name = request.all().name;
     lineMaster.start = request.all().start;
     lineMaster.end = request.all().end;
@@ -75,21 +98,20 @@ class MasterLineController {
 
     lineMaster.end_node_id = request.all().end_node_id;
 
-
-    if(!lineMaster.save()){
-        return response.json({'error':'database not connected'}, 400);
+    if (!lineMaster.save()) {
+      return response.json({ error: "database not connected" }, 400);
     }
 
     return response.json(lineMaster, 200);
   }
 
-  async drop({params,request,response,auth}){
-    let dropLineMaster = await MasterLine.find(params.id)
+  async drop({ params, request, response, auth }) {
+    let dropLineMaster = await MasterLine.find(params.id);
 
-    let dropAction = await dropLineMaster.delete()
-    if(!dropAction){
+    let dropAction = await dropLineMaster.delete();
+    if (!dropAction) {
       return response.json({ error: "database not connected" }, 200);
-    }else{
+    } else {
       return response.json({ success: "delete from database" }, 200);
     }
   }
