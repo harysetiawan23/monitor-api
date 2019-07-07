@@ -30,6 +30,8 @@ Route.group(() => {
   Route.post("line/drop/:id", "MasterLineController.drop");
 
   Route.get("record/store/:id/:flow/:pressure", "NodeDatumController.eventData");
+
+  Route.post("user/store","UserAuthController.store")
 }).prefix("/api");
 
 
