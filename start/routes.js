@@ -29,7 +29,7 @@ Route.group(() => {
   Route.post("line/:id", "MasterLineController.update").middleware(['auth']);
   Route.post("line/drop/:id", "MasterLineController.drop").middleware(['auth']);
 
-  Route.get("record/store/:id/:flow/:pressure", "NodeDatumController.eventData").middleware(['auth']);
+  Route.get("record/store/:id/:flow/:pressure", "NodeDatumController.eventData")
 
   Route.post("user/store","UserAuthController.store")
   Route.post("user/login","UserAuthController.login")
