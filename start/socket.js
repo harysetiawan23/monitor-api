@@ -18,9 +18,11 @@ const MasterLine = use("App/Models/MasterLine");
 const Database = use("Database");
 const NodeRecap = use("App/Models/NodeRecap");
 const LeakEvent = use("App/Models/LeakEvent");
-var fcm = require("fcm-notification");
-var FCM = new fcm("App/FirebaseConfig/google-service.json");
-var token = "token here";
+const Env = use("Env");
+var FCM = require("fcm-node");
+var serverKey = "AAAAbIajuFE:APA91bEtJXhoPCWTySghFp2-39H48_quizBFHjGmIBv99eV1PcJF5FMOROG04BD5cYphbgn8EzjNBRYMey4OgdgeeZTU9mQ-0mbDWXaiD38N10QpANIexjXeWySynSmoX6ullK-S-2jv"
+var fcm = new FCM(serverKey);
+console.log(serverKey)
 
 Ws.channel("chat", ({ socket }) => {
   console.log("user joined with %s socket id", socket.id);
@@ -106,26 +108,28 @@ const getLineStat = async io => {
 };
 
 const sendLekagaeNotification = async io => {
-
-
   var message = {
-    data: {
-      //This is only optional, you can send any data
-      score: "850",
-      time: "2:45"
-    },
+    //this may vary according to the message type (single recipient, multicast, topic, et cetera)
+    to: "registration_token",
+    collapse_key: "your_collapse_key",
+
     notification: {
-      title: "Title of notification",
-      body: "Body of notification"
+      title: "Title of your push notification",
+      body: "Body of your push notification"
     },
-    token: token
+
+    data: {
+      //you can send only notification or only data(or include both)
+      my_key: "my value",
+      my_another_key: "my another value"
+    }
   };
 
-  FCM.send(message, function(err, response) {
+  fcm.send(message, function(err, response) {
     if (err) {
-      console.log("error found", err);
+      console.log("Something has gone wrong!");
     } else {
-      console.log("response here", response);
+      console.log("Successfully sent with response: ", response);
     }
   });
 };
