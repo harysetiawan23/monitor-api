@@ -10,6 +10,7 @@ class LeakageController {
     let leakageList = []
     for(let i=0;i<leakList.rows.length;i++){
       let data ={
+        leakId:leakList.rows[i].id,
         created_at:leakList.rows[i].created_at,
         solved:leakList.rows[i].solved,
         lineData:lineMaster
@@ -19,6 +20,14 @@ class LeakageController {
 
     }
     return response.json(leakageList)
+  }
+
+  async setLeakageIntoSolved({params,request,response,auth}){
+    let leakList = await LeakageEvent.find(params.id)
+    leakList.solved = 1
+    await leakList.save()
+
+    return response.json({message:"success"})
   }
 }
 
