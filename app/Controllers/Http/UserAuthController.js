@@ -34,7 +34,8 @@ class UserAuthController {
     //Validation Role
     let loginRule = {
       email: "required",
-      password: "required"
+      password: "required",
+      fcm:"required"
     };
 
     //Validation Process
@@ -46,7 +47,7 @@ class UserAuthController {
     }
 
     //Get email and password
-    let { email, password } = request.all();
+    let { email, password ,fcm} = request.all();
 
     let {type,token,refreshToken,field,message} = await auth.withRefreshToken().attempt(email, password);
 
@@ -61,6 +62,7 @@ class UserAuthController {
     }
 
     let user = await User.findBy("email", email);
+    user.fcm_token = fcm
 
 
 
