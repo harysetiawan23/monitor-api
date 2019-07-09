@@ -31,6 +31,9 @@ Route.group(() => {
 
   Route.get("record/store/:id/:flow/:pressure", "NodeDatumController.eventData")
 
+  Route.get("leakage/:id","LeakageController.getLekage").middleware(['auth']);
+
+
   Route.post("user/store","UserAuthController.store")
   Route.post("user/login","UserAuthController.login")
 }).prefix("/api");

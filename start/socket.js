@@ -18,11 +18,12 @@ const MasterLine = use("App/Models/MasterLine");
 const Database = use("Database");
 const NodeRecap = use("App/Models/NodeRecap");
 const LeakEvent = use("App/Models/LeakEvent");
-const Env = use("Env");
+const User = use("App/Models/User");
+
 var FCM = require("fcm-node");
-var serverKey = "AAAAbIajuFE:APA91bEtJXhoPCWTySghFp2-39H48_quizBFHjGmIBv99eV1PcJF5FMOROG04BD5cYphbgn8EzjNBRYMey4OgdgeeZTU9mQ-0mbDWXaiD38N10QpANIexjXeWySynSmoX6ullK-S-2jv"
+var serverKey =
+  "AAAAbIajuFE:APA91bEtJXhoPCWTySghFp2-39H48_quizBFHjGmIBv99eV1PcJF5FMOROG04BD5cYphbgn8EzjNBRYMey4OgdgeeZTU9mQ-0mbDWXaiD38N10QpANIexjXeWySynSmoX6ullK-S-2jv";
 var fcm = new FCM(serverKey);
-console.log(serverKey)
 
 Ws.channel("chat", ({ socket }) => {
   console.log("user joined with %s socket id", socket.id);
@@ -108,32 +109,53 @@ const getLineStat = async io => {
 };
 
 const sendLekagaeNotification = async io => {
-  var message = {
-    //this may vary according to the message type (single recipient, multicast, topic, et cetera)
-    to: "registration_token",
-    collapse_key: "your_collapse_key",
+  let lekagaeEvent = await LeakEvent.query()
+    .where("informed", "=", "0")
+    .fetch();
+  for (let i = 0; i < lekagaeEvent.rows.length; i++) {
+    let user = await User.find(lekagaeEvent.rows[i].user_id);
+    let leakageEventItem = lekagaeEvent.rows[i];
+    let lineMaster = await MasterLine.find(leakageEventItem.line_id);
 
-    notification: {
-      title: "Title of your push notification",
-      body: "Body of your push notification"
-    },
+    let lineLekaage = await LeakEvent.find(leakageEventItem.id);
+    lineLekaage.informed = 1;
+    console.log(lineLekaage);
+    await lineLekaage.save();
 
-    data: {
-      //you can send only notification or only data(or include both)
-      my_key: "my value",
-      my_another_key: "my another value"
+
+    if (leakageEventItem.solved == 0) {
+      let message = {
+        //this may vary according to the message type (single recipient, multicast, topic, et cetera)
+        to: user.fcm,
+        collapse_key: "Test Message",
+
+        notification: {
+          title: "Kebocoran",
+          body: "Terjadi kebocoran pada " + lineMaster.name + " "
+        },
+
+        data: {
+          //you can send only notification or only data(or include both)
+          my_key: "my value",
+          my_another_key: "my another value"
+        }
+      };
+
+      await fcm.send(message, function(err, response) {
+        if (err) {
+          console.log("Something has gone wrong!");
+        } else {
+          console.log("Successfully sent with response: ", response);
+
+        }
+      });
+
+
     }
-  };
-
-  fcm.send(message, function(err, response) {
-    if (err) {
-      console.log("Something has gone wrong!");
-    } else {
-      console.log("Successfully sent with response: ", response);
-    }
-  });
+  }
 };
 
 setInterval(checkLineLeakage, 1000, io);
 setInterval(getLineRecords, 1000, io);
 setInterval(getLineStat, 1000, io);
+setInterval(sendLekagaeNotification, 5000, io);
