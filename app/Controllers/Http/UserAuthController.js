@@ -62,7 +62,8 @@ class UserAuthController {
     }
 
     let user = await User.findBy("email", email);
-    user.fcm_token = fcm
+    user.fcm = fcm
+    await user.save()
 
 
 
