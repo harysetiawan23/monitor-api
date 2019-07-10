@@ -65,12 +65,18 @@ const checkLineLeakage = async io => {
         user_id: lineMaster.user_id
       };
 
-      let latestLeakageInfo = await LeakEvent.query().where("line_id", lineData.rows[i].id).orderBy("created_at", "desc").first();
+      let latestLeakageInfo = await LeakEvent.query()
+        .where("line_id", lineData.rows[i].id)
+        .orderBy("created_at", "desc")
+        .first();
 
       if (latestLeakageInfo == null && lineFlowLeak > lineLeakageTreshold) {
         await LeakEvent.create(leakageData);
       } else {
-        if (parseInt(latestLeakageInfo.solved) != 1) {
+        if (
+          parseInt(latestLeakageInfo.solved) != 1 &&
+          lineFlowLeak > lineLeakageTreshold
+        ) {
         } else {
           await LeakEvent.create(leakageData);
         }
@@ -116,7 +122,6 @@ const sendLekagaeNotification = async io => {
     console.log(lineLekaage);
     await lineLekaage.save();
 
-
     if (leakageEventItem.solved == 0) {
       let message = {
         //this may vary according to the message type (single recipient, multicast, topic, et cetera)
@@ -140,11 +145,8 @@ const sendLekagaeNotification = async io => {
           console.log("Something has gone wrong!");
         } else {
           console.log("Successfully sent with response: ", response);
-
         }
       });
-
-
     }
   }
 };
