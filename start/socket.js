@@ -57,9 +57,7 @@ const checkLineLeakage = async io => {
     );
 
     // Check if leakage is more thean treshold
-    if (
-      lineFlowLeak > lineLeakageTreshold
-    ) {
+    if (lineFlowLeak > lineLeakageTreshold) {
       let leakageData = {
         line_id: lineData.rows[i].id,
         informed: 0,
@@ -67,12 +65,9 @@ const checkLineLeakage = async io => {
         user_id: lineMaster.user_id
       };
 
-      let latestLeakageInfo = await LeakEvent.query()
-        .where("line_id", lineData.rows[i].id)
-        .orderBy("created_at", "desc")
-        .first();
+      let latestLeakageInfo = await LeakEvent.query().where("line_id", lineData.rows[i].id).orderBy("created_at", "desc").first();
 
-      if (latestLeakageInfo == null) {
+      if (latestLeakageInfo == null && lineFlowLeak > lineLeakageTreshold) {
         await LeakEvent.create(leakageData);
       } else {
         if (parseInt(latestLeakageInfo.solved) != 1) {
