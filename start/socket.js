@@ -58,8 +58,7 @@ const checkLineLeakage = async io => {
 
     // Check if leakage is more thean treshold
     if (
-      lineFlowLeak > lineLeakageTreshold ||
-      linePressureLeak > lineLeakageTreshold
+      lineFlowLeak > lineLeakageTreshold
     ) {
       let leakageData = {
         line_id: lineData.rows[i].id,
