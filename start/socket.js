@@ -104,7 +104,7 @@ const getLineStat = async io => {
   let lineStatData = lineStat[0][0];
 
   for (let i = 0; i < lineStatData.length; i++) {
-    io.emit("line-stat/" + lineStatData[i].id, lineStatData[i]);
+    io.emit("line-stat/" + lineStatData[i].id, lineStatData[i].reverse());
   }
 };
 
