@@ -15,6 +15,7 @@
 
 const Ws = use("Ws");
 const MasterLine = use("App/Models/MasterLine");
+const MasterNode = use("App/Models/MasterNode");
 const Database = use("Database");
 const NodeRecap = use("App/Models/NodeRecap");
 const LeakEvent = use("App/Models/LeakEvent");
@@ -104,7 +105,8 @@ const getLineStat = async io => {
   let lineStatData = lineStat[0][0];
 
   for (let i = 0; i < lineStatData.length; i++) {
-    io.emit("line-stat/" + lineStatData[i].id, lineStatData[i].reverse());
+    io.emit("line-stat/" + lineStatData[i].id, lineStatData[i]);
+    console.log({lineId:lineStatData[i].id,lineStat:lineStatData[i]})
   }
 };
 
@@ -151,7 +153,20 @@ const sendLekagaeNotification = async io => {
   }
 };
 
+const getNodeStat = async io => {
+  let nodeMasters = await MasterNode.all();
+
+  for(let i =0;i<nodeMasters.rows.length;i++){
+    let nodeMasterItem = nodeMasters.rows[i]
+    let nodeStat  = await Database.raw("call showNodeStat('"+nodeMasterItem.sn+"');")
+    console.log({nodeId:nodeMasterItem.id,nodeStat:nodeStat[0][0]})
+    io.emit("node-stat/" + nodeMasterItem.id, nodeStat[0][0]);
+
+  }
+};
+
 setInterval(checkLineLeakage, 1000, io);
 setInterval(getLineRecords, 1000, io);
 setInterval(getLineStat, 1000, io);
+setInterval(getNodeStat, 1000, io);
 setInterval(sendLekagaeNotification, 5000, io);
