@@ -16,7 +16,8 @@ class MasterLineController {
         "(select nm.lat from master_nodes nm where nm.id = lm.end_node_id)            as endNodeLat," +
         "(select nm.lng from master_nodes nm where nm.id = lm.end_node_id)            as endNodeLng" +
         " from master_lines lm" +
-        " where lm.user_id = "+auth.user.id
+        " where lm.user_id = " +
+        auth.user.id
     );
     return response.json(masterLine[0]);
   }
@@ -33,7 +34,10 @@ class MasterLineController {
         "(select nm.lat from master_nodes nm where nm.id = lm.end_node_id)            as endNodeLat," +
         "(select nm.lng from master_nodes nm where nm.id = lm.end_node_id)            as endNodeLng" +
         " from master_lines lm" +
-        " where lm.user_id = "+auth.user.id+" and lm.id = "+params.id
+        " where lm.user_id = " +
+        auth.user.id +
+        " and lm.id = " +
+        params.id
     );
     return response.json(masterLine[0][0]);
   }
@@ -77,11 +81,12 @@ class MasterLineController {
       distance: "required",
       diameter: "required",
       thicknes: "required",
-      manufacture: "required"
+      manufacture: "required",
+      leakage_treshold: "required"
     });
 
     if (validator.fails()) {
-      return response().json({ errors: validator.messages() }, 401);
+      return response.json({ errors: validator.messages() }, 401);
     }
 
     let lineMaster = await MasterLine.find(params.id);
@@ -97,6 +102,7 @@ class MasterLineController {
     lineMaster.manufacture = request.all().manufacture;
 
     lineMaster.end_node_id = request.all().end_node_id;
+    lineMaster.leakage_treshold = request.all().leakage_treshold;
 
     if (!lineMaster.save()) {
       return response.json({ error: "database not connected" }, 400);
