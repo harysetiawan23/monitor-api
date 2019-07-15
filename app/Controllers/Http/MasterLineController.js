@@ -107,7 +107,7 @@ class MasterLineController {
     lineMaster.manufacture = request.all().manufacture;
 
     lineMaster.end_node_id = request.all().end_node_id;
-    lineMaster.flow_leakage_treshold = request.all().leakage_treshold;
+    lineMaster.flow_leakage_treshold = request.all().flow_leakage_treshold;
     lineMaster.pressure_check_duration = request.all().pressure_check_duration;
     lineMaster.pressure_leakage = request.all().pressure_leakage
 
