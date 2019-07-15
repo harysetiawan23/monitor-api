@@ -43,6 +43,7 @@ const checkLineLeakage = async io => {
       .orderBy("created_at", "desc")
       .first();
 
+
     // Line Master
     let lineMaster = await MasterLine.find(lineData.rows[i].id);
 
@@ -53,12 +54,14 @@ const checkLineLeakage = async io => {
     let linePressureLeak = parseFloat(
       (lineRecord.pressure_leak_ratio * 100).toFixed(1)
     );
-    let lineLeakageTreshold = parseFloat(
-      (lineMaster.leakage_treshold * 100).toFixed(1)
+    let lineFlowLeakageTreshold = parseFloat(
+      (lineMaster.flow_leakage_treshold * 100).toFixed(1)
     );
 
-    // Check if leakage is more thean treshold
-    if (lineFlowLeak > lineLeakageTreshold) {
+    console.log(lineFlowLeakageTreshold)
+
+    // Check cif leakage is more thean treshold
+    if (lineFlowLeak > lineFlowLeakageTreshold) {
       let leakageData = {
         line_id: lineData.rows[i].id,
         informed: 0,
@@ -106,7 +109,7 @@ const getLineStat = async io => {
 
   for (let i = 0; i < lineStatData.length; i++) {
     io.emit("line-stat/" + lineStatData[i].id, lineStatData[i]);
-    console.log({lineId:lineStatData[i].id,lineStat:lineStatData[i]})
+
   }
 };
 
@@ -160,7 +163,7 @@ const getNodeStat = async io => {
     let nodeMasterItem = nodeMasters.rows[i]
     let nodeStat  = await Database.raw("call showNodeStat('"+nodeMasterItem.sn+"');")
     let nodeData  = await Database.raw("call showNodeHistory('"+nodeMasterItem.sn+"');")
-    console.log({nodeId:nodeMasterItem.id,nodeStat:nodeStat[0][0]})
+
     io.emit("node-stat/" + nodeMasterItem.id, nodeStat[0][0]);
     io.emit("node-history/" + nodeMasterItem.id, nodeData[0][0]);
 

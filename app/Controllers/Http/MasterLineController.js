@@ -52,11 +52,14 @@ class MasterLineController {
       distance: "required",
       diameter: "required",
       thicknes: "required",
-      manufacture: "required"
+      manufacture: "required",
+      flow_leakage_treshold: "required",
+      pressure_check_duration:'required',
+      pressure_leakage:'required'
     });
 
     if (validator.fails()) {
-      return response().json({ errors: validator.messages() }, 401);
+      return response.json({ errors: validator.messages() }, 401);
     }
 
     let line = request.all();
@@ -82,7 +85,9 @@ class MasterLineController {
       diameter: "required",
       thicknes: "required",
       manufacture: "required",
-      leakage_treshold: "required"
+      flow_leakage_treshold: "required",
+      pressure_check_duration:'required',
+      pressure_leakage:'required'
     });
 
     if (validator.fails()) {
@@ -102,7 +107,9 @@ class MasterLineController {
     lineMaster.manufacture = request.all().manufacture;
 
     lineMaster.end_node_id = request.all().end_node_id;
-    lineMaster.leakage_treshold = request.all().leakage_treshold;
+    lineMaster.flow_leakage_treshold = request.all().leakage_treshold;
+    lineMaster.pressure_check_duration = request.all().pressure_check_duration;
+    lineMaster.pressure_leakage = request.all().pressure_leakage
 
     if (!lineMaster.save()) {
       return response.json({ error: "database not connected" }, 400);
