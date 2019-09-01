@@ -161,8 +161,8 @@ const getNodeStat = async io => {
 
   for(let i =0;i<nodeMasters.rows.length;i++){
     let nodeMasterItem = nodeMasters.rows[i]
-    let nodeStat  = await Database.raw("call showNodeStat("+nodeMasterItem.sn+");")
-    let nodeData  = await Database.raw("call showNodeHistory("+nodeMasterItem.sn+");")
+    let nodeStat  = await Database.raw('call showNodeStat('+nodeMasterItem.sn+');')
+    let nodeData  = await Database.raw('call showNodeHistory('+nodeMasterItem.sn+');')
 
     io.emit("node-stat/" + nodeMasterItem.sn, nodeStat[0][0]);
     io.emit("node-history/" + nodeMasterItem.sn, nodeData[0][0]);
