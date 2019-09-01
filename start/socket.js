@@ -58,7 +58,7 @@ const checkLineLeakage = async io => {
       (lineMaster.flow_leakage_treshold * 100).toFixed(1)
     );
 
-    console.log(lineFlowLeakageTreshold)
+
 
     // Check cif leakage is more thean treshold
     if (lineFlowLeak > lineFlowLeakageTreshold) {
@@ -164,8 +164,8 @@ const getNodeStat = async io => {
     let nodeStat  = await Database.raw("call showNodeStat('"+nodeMasterItem.sn+"');")
     let nodeData  = await Database.raw("call showNodeHistory('"+nodeMasterItem.sn+"');")
 
-    io.emit("node-stat/" + nodeMasterItem.id, nodeStat[0][0]);
-    io.emit("node-history/" + nodeMasterItem.id, nodeData[0][0]);
+    io.emit("node-stat/" + nodeMasterItem.sn, nodeStat[0][0]);
+    io.emit("node-history/" + nodeMasterItem.sn, nodeData[0][0]);
 
   }
 };
