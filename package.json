@@ -29,7 +29,7 @@
     "fcm-node": "^1.5.1",
     "fcm-notification": "^2.0.0",
     "mysql": "^2.17.1",
-    "socket.io": "^2.2.0"
+    "socket.io": "^2.4.0"
   },
   "devDependencies": {},
   "autoload": {
